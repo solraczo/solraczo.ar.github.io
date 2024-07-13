@@ -1,23 +1,48 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Activar Cámara Trasera</title>
+    <title>GLTF Viewer</title>
+    <style>
+        body { margin: 0; overflow: hidden; }
+        canvas { display: block; }
+    </style>
 </head>
 <body>
-    <h1>Activar Cámara Trasera</h1>
-    <video id="camera" autoplay playsinline></video>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', async () => {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-                const videoElement = document.getElementById('camera');
-                videoElement.srcObject = stream;
-            } catch (error) {
-                console.error('Error al acceder a la cámara:', error);
-            }
+        // Set up the scene, camera, and renderer
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // Load the GLTF model
+        const loader = new THREE.GLTFLoader();
+        loader.load('https://github.com/solraczo/solraczo.ar.github.io/blob/main/modelo.gltf', function (gltf) {
+            scene.add(gltf.scene);
+            camera.position.z = 5;
+            animate();
         });
+
+        // Animate the scene
+        function animate() {
+            requestAnimationFrame(animate);
+            renderer.render(scene, camera);
+        }
+
+        // Access the camera
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            navigator.mediaDevices.getUserMedia({ video: true }).then(function (stream) {
+                const video = document.createElement('video');
+                video.srcObject = stream;
+                video.play();
+                document.body.appendChild(video);
+            });
+        }
     </script>
 </body>
 </html>
